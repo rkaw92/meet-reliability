@@ -49,6 +49,14 @@
 		
 		var AppClient = __webpack_require__(1).AppClient(window.WebSocket);
 		
+		class Auction {
+			constructor() {
+				this.created = false;
+				this.name = 'NOT CREATED';
+				this.amount = '--';
+			}
+		}
+		
 		class PresentationController {
 			constructor(config) {
 				// Elements:
@@ -57,11 +65,13 @@
 				
 				// State:
 				this._config = config || {
-					server: 'ws://[::1]:8865'
+					server: 'ws://[::1]:8865',
+					auctionID: 'AUCTION-2'
 				};
 				this._revealed = false;
 				this._connected = false;
 				this._connectionEnabled = false;
+				this._auctionState = new Auction();
 				
 				// Network:
 				this._appClient = null;
@@ -76,23 +86,44 @@
 				this._connectionStatusIndicator.style.color = this._connected ? 'green' : 'red';
 			}
 			
+			_updateAuctionPreview() {
+				var auction = this._auctionState || new Auction();
+				var preview = window.document.getElementById('auctionPreview');
+				preview.querySelector('.name').textContent = auction.name;
+				preview.querySelector('.amount').textContent = auction.amount;
+			}
+			
+			_loadAuctionData() {
+				var self = this;
+				// Query the server:
+				self._appClient.call('getAuction', { ID: self._config.auctionID, live: true }).then(function(data) {
+					// Set our view model's state:
+					self._auctionState = data;
+					self._updateAuctionPreview();
+				});
+			}
+			
 			_startClient() {
 				var self = this;
+				// Initialize the application client:
 				self._appClient = new AppClient(self._config.server);
+				
+				// Set a state flag, which will be automatically updated whenever anything changes:
 				self._connectionEnabled = true;
 				self._appClient.transport.on('connect', function() {
 					self._connected = true;
 					self._updateConnectionStateWidget();
+					self._loadAuctionData();
 				});
 				self._appClient.transport.on('disconnect', function() {
 					self._connected = false;
 					self._updateConnectionStateWidget();
 				});
-				window.appClient = self._appClient;
 				self._updateConnectionStateWidget();
+				
+				// For debugging:
+				window.appClient = self._appClient;
 			}
-			
-			
 			
 			run() {
 				var self = this;
@@ -109,6 +140,7 @@
 					revelationButton.blur();
 					
 					self._startClient();
+					self._revealed = true;
 				});
 				
 				// The status indicator button can toggle the connection state:
@@ -310,9 +342,11 @@
 					self._handleOpen();
 				},
 				error: function(error) {
+					console.log('! error');
 					self._handleError(error);
 				},
 				close: function(closeEvent) {
+					console.log('! close');
 					self._handleDisconnect();
 				},
 				message: function(messageEvent) {
@@ -396,11 +430,9 @@
 		
 		SocketTransport.prototype._handleDisconnect = function _handleDisconnect() {
 			var stateAtDisconnectTime = this._state;
-			if (this._active) {
+			this._state = 'unconnected';
+			if (this._active && stateAtDisconnectTime !== 'retrying') {
 				this._retryConnection();
-			}
-			else {
-				this._state = 'unconnected';
 			}
 			if (stateAtDisconnectTime === 'connected') {
 				this.emit('disconnect');
@@ -408,13 +440,16 @@
 		};
 		
 		SocketTransport.prototype._retryConnection = function _retryConnection() {
+			console.log('_retryConnection');
 			var self = this;
-			self._state = 'retrying';
-			//TODO: Custom delay strategy.
-			self._reconnectTimeout = setTimeout(function() {
-				self._reconnectTimeout = null;
-				self._connect();
-			}, 2000);
+			if (self._state !== 'retrying') {
+				self._state = 'retrying';
+				//TODO: Custom delay strategy.
+				self._reconnectTimeout = setTimeout(function() {
+					self._reconnectTimeout = null;
+					self._connect();
+				}, 2000);
+			}
 		};
 		
 		// ### Publc methods ###
