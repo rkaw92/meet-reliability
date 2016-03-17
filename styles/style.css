@@ -1,0 +1,53 @@
+/*
+ * ### THE LOW-TECH COLOUR BOOK ###
+ * This is the colour palette used for the presentation. If used with a language that compiles to CSS,
+ *  these hand-made notes would likely be translated into variables.
+ * main: white
+ * subtitles: #DDDDDD
+ * active: #B0241B
+ */
+
+/* ### Headings ### */
+
+#custom .caption {
+	background: #4caf50 -webkit-linear-gradient(315deg, #5F2E8C 50%, #CC137E 50%) no-repeat;
+	background: #4caf50 linear-gradient(135deg, #5F2E8C 50%, #CC137E 50%) no-repeat
+}
+
+/* ### Cover page ### */
+
+#custom .cover {
+	width: 100%;
+}
+
+#custom #cover * {
+	color: white;
+}
+
+#custom #cover {
+	text-align: center;
+}
+
+#custom #cover .catchy {
+	color: red;
+}
+
+#custom #cover a[href] {
+	color: #DDDDDD;
+}
+
+#custom #cover .author {
+	color: #DDDDDD;
+}
+
+/* ### Regular slides ### */
+
+#custom .slide h2 {
+	color: #B0241B
+}
+
+/* ### Footer ### */
+
+#custom .progress {
+	background-color: #B0241B;
+}
