@@ -13,15 +13,24 @@
 	padding: 0.5em 0.5em;
 }
 
-.statusPanel.enabled {
-	display: block;
+.statusPanel #auctionPreview {
+	font-size: 120%;
+	line-height: 1.2em;
 }
+
+.secret {
+	display: none;
+}
+.secret.visible {
+	display: unset;
+}
+
+/*.statusPanel.visible {
+	display: block;
+}*/
 
 button#revelation {
 	padding: 1.0em 3.0em;
-	background-color: #B0241B;
-	color: white;
-	border: none;
 }
 
 button#connectionStatusIndicator {
@@ -41,4 +50,22 @@ button#connectionStatusIndicator {
 button#connectionStatusIndicator .setting {
 	font-size: 75%;
 	color: black;
+}
+
+.demoForm {
+	position: absolute;
+	right: 0;
+	top: 35%;
+	width: 40%;
+	margin: 0.5em 0.5em;
+	padding: 0.5em 0.5em;
+	box-sizing: border-box;
+	border: 1px solid #DDDDDD;
+}
+
+button {
+	background-color: #B0241B;
+	color: white;
+	border: none;
+	padding: 0.2em 0.5em;
 }

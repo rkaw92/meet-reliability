@@ -15,7 +15,7 @@
 	<script src="js/bundle.js"></script>
 </head>
 <body class="shower list" id="custom">
-	<div class="statusPanel" id="statusPanel">
+	<div class="statusPanel secret" id="statusPanel">
 		<p id="connectionStatus"><button id="connectionStatusIndicator"><span class="status">??</span><br><span class="setting">(uninit)</span></button></p>
 		<div id="auctionPreview">
 			<p>Title: <span class="name">...</span></p>
@@ -65,6 +65,84 @@
 		<h2>Example: The App</h2>
 		<p>What app?</p>
 		<button id="revelation">This app</button>
+		<div class="secret demoForm">
+			<p>Place your offer:</p>
+			€ <input type="text" value="1.00"><button>Bid</button>
+		</div>
+	</section>
+	
+	<section class="slide">
+		<h2>What's up?</h2>
+		<ol>
+			<li>JSON-RPC 2.0 commands over WebSocket</li>
+			<li>Events over the same transport (multiplexed)</li>
+			<li>Node.js back-end</li>
+		</ol>
+	</section>
+	
+	<section class="slide">
+		<h2>...but RPC is so 1990!</h2>
+		<ol>
+			<li>Chosen for behavior semantics
+				<ul>
+					<li>REST best-suited for data-driven apps</li>
+					<li>PATCH non-standardized</li>
+				</ul>
+			</li>
+			<li>Pipelining suport
+				<ul>
+					<li>Correlated request-response over connected transport</li>
+				</ul>
+			</li>
+		</ol>
+	</section>
+	
+	<section class="slide">
+		<h2>"No effects lost"</h2>
+		<ul>
+			<li>Retries on connection issues
+				<ul>
+					<li>Retry strategy</li>
+					<li>Consistent feedback</li>
+				</ul>
+			</li>
+		</ul>
+	</section>
+	
+	<section class="slide">
+		<h2>"No effects duplicated"</h2>
+		<ul>
+			<li>Deterministic back-end logic
+				<ul>
+					<li style="font-style: italic;">(state, input) → newState</li>
+				</ul>
+			</li>
+			<li>All identifiers supplied by the client</li>
+		</ul>
+	</section>
+	
+	<section class="slide">
+		<h2>"Timely propagation"</h2>
+		<ul>
+			<li>Reactive messaging
+				<ol>
+					<li>Pub-Sub</li>
+					<li>Event Sourcing at the core</li>
+					<li>Read-side projections (CQRS)</li>
+					<li>Properly-named events capture intent</li>
+					<li>WebSocket to the client</li>
+				</ol>
+			</li>
+		</ul>
+	</section>
+	
+	<section class="slide">
+		<h2>The takeaway</h2>
+		<ol>
+			<li>Predictability requires both architectural and code-level design</li>
+			<li>API semantics matter</li>
+			<li>Reliability must not be taken for granted</li>
+		</ol>
 	</section>
 	
 	<div class="progress"></div>

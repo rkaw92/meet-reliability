@@ -7,7 +7,10 @@
 		constructor() {
 			this.created = false;
 			this.name = 'NOT CREATED';
-			this.amount = '--';
+			this.offer = {
+				amount: 0,
+				buyer: ''
+			};
 		}
 	}
 	
@@ -15,7 +18,9 @@
 		constructor(config) {
 			// Elements:
 			this._panel = window.document.getElementById('statusPanel');
+			this._revelationButton = window.document.getElementById('revelation');
 			this._connectionStatusIndicator = window.document.getElementById('connectionStatusIndicator');
+			this._demoForms = window.document.getElementsByClassName('demoForm');
 			
 			// State:
 			this._config = config || {
@@ -44,7 +49,7 @@
 			var auction = this._auctionState || new Auction();
 			var preview = window.document.getElementById('auctionPreview');
 			preview.querySelector('.name').textContent = auction.name;
-			preview.querySelector('.amount').textContent = auction.amount;
+			preview.querySelector('.amount').textContent = ((auction.offer || {}).amount || 0).toLocaleString('en-US', { style: 'currency', currency: 'EUR' });
 		}
 		
 		_loadAuctionData() {
@@ -54,6 +59,25 @@
 				// Set our view model's state:
 				self._auctionState = data;
 				self._updateAuctionPreview();
+			});
+		}
+		
+		_installEventHandlers() {
+			var self = this;
+			// We are going to inspect every message to see if it looks like an event.
+			// If it does, we process it and update the auction's state.
+			self._appClient.transport.on('message', function(message) {
+				var auction = self._auctionState;
+				var data = JSON.parse(message);
+				if (data.eventType) {
+					switch (data.eventType) {
+						case 'AuctionOfferPlaced':
+							auction.offer = data.eventPayload.offer;
+							break;
+					}
+					
+					self._updateAuctionPreview();
+				}
 			});
 		}
 		
@@ -75,26 +99,39 @@
 			});
 			self._updateConnectionStateWidget();
 			
+			self._installEventHandlers();
+			
 			// For debugging:
 			window.appClient = self._appClient;
 		}
 		
+		_reveal() {
+			var revelationButton = this._revelationButton;
+			
+			// Guard clause: only run the "revelation" code once.
+			if (this._revealed) {
+				return;
+			}
+			
+			var elementsToReveal = window.document.querySelectorAll('.secret');
+			Array.prototype.forEach.call(elementsToReveal, function(element) {
+				element.classList.add('visible');
+			});
+			
+			revelationButton.blur();
+			
+			this._startClient();
+			this._revealed = true;
+		}
+		
 		run() {
 			var self = this;
-			var revelationButton = window.document.getElementById('revelation');
-			var panel = self._panel;
+			var revelationButton = self._revelationButton;
+			var demoForms = self._demoForms;
 			
 			// The "revelation" button starts the entire client up and uncovers some elements:
 			revelationButton.addEventListener('click', function() {
-				// Guard clause: only run the "revelation" code once.
-				if (self._revealed) {
-					return;
-				}
-				panel.classList.add('enabled');
-				revelationButton.blur();
-				
-				self._startClient();
-				self._revealed = true;
+				self._reveal();
 			});
 			
 			// The status indicator button can toggle the connection state:
@@ -111,6 +148,24 @@
 					self._appClient.transport.start();
 				}
 				statusButton.blur();
+			});
+			
+			// The first demonstration form allows the user to place offers in the current auction:
+			demoForms[0].querySelector('button').addEventListener('click', function() {
+				self._appClient.call('placeOffer', {
+					ID: self._config.auctionID,
+					buyer: 'joe',
+					amount: Number(demoForms[0].querySelector('input').value)
+				});
+			});
+			
+			// The second one is much like the first, but 
+			demoForms[0].querySelector('button').addEventListener('click', function() {
+				self._appClient.call('placeOffer', {
+					ID: self._config.auctionID,
+					buyer: 'joe',
+					amount: Number(demoForms[0].querySelector('input').value)
+				});
 			});
 		}
 	}
