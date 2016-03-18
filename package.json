@@ -1,0 +1,34 @@
+{
+  "name": "meet-reliability",
+  "version": "1.0.0",
+  "description": "a presentation about writing reliable real-time JS apps",
+  "main": "js/bundle.js",
+  "dependencies": {
+    "esdf-ws-client.bak": "^0.1.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rkaw92/meet-reliability.git"
+  },
+  "keywords": [
+    "meet.js",
+    "reliability",
+    "presentation",
+    "real-time",
+    "realtime",
+    "event",
+    "sourcing",
+    "ddd",
+    "cqrs"
+  ],
+  "author": "Robert Kawecki <robert+npm@rkaw.pl>",
+  "license": "CC-BY-4.0",
+  "bugs": {
+    "url": "https://github.com/rkaw92/meet-reliability/issues"
+  },
+  "homepage": "https://github.com/rkaw92/meet-reliability#readme"
+}
