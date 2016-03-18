@@ -93,3 +93,10 @@ button {
 	font-size: 60%;
 	margin: 0 0;
 }
+
+img.right {
+	position: absolute;
+	top: 10%;
+	right: 0;
+	margin-right: 3.0em;
+}
