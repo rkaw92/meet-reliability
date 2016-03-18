@@ -51,3 +51,7 @@
 #custom .progress {
 	background-color: #B0241B;
 }
+
+#custom a[href] {
+	color: #B0241B;
+}
