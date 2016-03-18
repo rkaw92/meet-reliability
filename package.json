@@ -4,7 +4,7 @@
   "description": "a presentation about writing reliable real-time JS apps",
   "main": "js/bundle.js",
   "dependencies": {
-    "esdf-ws-client.bak": "^0.1.0"
+    "esdf-ws-client": "^0.1.0"
   },
   "devDependencies": {},
   "scripts": {
