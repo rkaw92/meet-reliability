@@ -1,6 +1,6 @@
 {
   "name": "meet-reliability",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "a presentation about writing reliable real-time JS apps",
   "main": "js/bundle.js",
   "dependencies": {
