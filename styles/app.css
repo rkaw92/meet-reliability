@@ -69,3 +69,27 @@ button {
 	border: none;
 	padding: 0.2em 0.5em;
 }
+
+.requestLog ol {
+	display: block;
+	font-size: 75% !important;
+	height: 6.0em;
+	max-height: 6.0em;
+	overflow: auto;
+	width: 50%;
+}
+
+.codeSample {
+	display: block;
+	margin: 0.5em auto;
+	padding: 0.5em 0.5em;
+	box-sizing: border-box;
+	border: 1px solid #DDDDDD;
+	height: auto;
+}
+
+.slide .codeSample pre {
+	white-space: pre;
+	font-size: 60%;
+	margin: 0 0;
+}

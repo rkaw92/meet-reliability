@@ -67,6 +67,7 @@
 				this._revelationButton = window.document.getElementById('revelation');
 				this._connectionStatusIndicator = window.document.getElementById('connectionStatusIndicator');
 				this._demoForms = window.document.getElementsByClassName('demoForm');
+				this._requestLogs = window.document.getElementsByClassName('requestLog');
 				
 				// State:
 				this._config = config || {
@@ -110,6 +111,7 @@
 			
 			_installEventHandlers() {
 				var self = this;
+				var requestLogs = this._requestLogs;
 				// We are going to inspect every message to see if it looks like an event.
 				// If it does, we process it and update the auction's state.
 				self._appClient.transport.on('message', function(message) {
@@ -124,6 +126,14 @@
 						
 						self._updateAuctionPreview();
 					}
+				});
+				
+				// The request log on "No effects lost" presents the requests as they happen and responses to them:
+				self._appClient.RPC.on('request', function(request) {
+					self._logMessage(requestLogs[0], 'request: ' + request.method);
+				});
+				self._appClient.RPC.on('response', function(response) {
+					self._logMessage(requestLogs[0], 'response: ' + (response.error ? 'ERROR' : 'ok'));
 				});
 			}
 			
@@ -170,6 +180,13 @@
 				this._revealed = true;
 			}
 			
+			_logMessage(logElement, message) {
+				var listElement = logElement.querySelector('ol');
+				var logEntryElement = window.document.createElement('li');
+				logEntryElement.textContent = message;
+				listElement.appendChild(logEntryElement);
+			}
+			
 			run() {
 				var self = this;
 				var revelationButton = self._revelationButton;
@@ -205,12 +222,12 @@
 					});
 				});
 				
-				// The second one is much like the first, but 
-				demoForms[0].querySelector('button').addEventListener('click', function() {
+				// The second one is much like the first.
+				demoForms[1].querySelector('button').addEventListener('click', function() {
 					self._appClient.call('placeOffer', {
 						ID: self._config.auctionID,
 						buyer: 'joe',
-						amount: Number(demoForms[0].querySelector('input').value)
+						amount: Number(demoForms[1].querySelector('input').value)
 					});
 				});
 			}
@@ -394,6 +411,7 @@
 			var self = this;
 			var listeners = {
 				open: function() {
+					console.log('! open');
 					self._handleOpen();
 				},
 				error: function(error) {
@@ -421,6 +439,7 @@
 		};
 		
 		SocketTransport.prototype._setup = function _setup() {
+			console.log('_setup');
 			// We take the listeners from our internal map, so that we have a reference to them at all times.
 			// This lets us remove them during teardown and avoid a listener (memory) leak.
 			var listeners = this._standardListeners;
@@ -431,6 +450,7 @@
 		};
 		
 		SocketTransport.prototype._teardown = function _teardown() {
+			console.log('_teardown');
 			var listeners = this._standardListeners;
 			// Guard clause: if no socket is present at all, do nothing.
 			if (!this._socket) {
@@ -452,23 +472,22 @@
 		};
 		
 		SocketTransport.prototype._disconnect = function _disconnect() {
-			// Behave as if the socket has disconnected on its own. Notify listeners.
-			this._handleDisconnect();
 			// Clear the reconnection timeout, if any.
 			if (this._reconnectTimeout) {
 				clearTimeout(this._reconnectTimeout);
 				this._reconnectTimeout = null;
 			}
-			// Remove all event listeners. If the socket emits a 'close' event, we do not want to be repeating the already-emitted event.
-			this._teardown();
 			// Only then do we close the socket.
 			try {
 				this._socket.close();
+				console.log('-> socket closed!');
 			}
 			catch (error) {
 				// If an error occurs, this probably means that the socket is already closed.
 				// Thus, we do not have to do anything further.
 			}
+			// Behave as if the socket has disconnected on its own. Notify listeners.
+			//this._handleDisconnect();
 			// Finally, we can clear the reference to the socket.
 			this._socket = null;
 		};
@@ -486,7 +505,9 @@
 		SocketTransport.prototype._handleDisconnect = function _handleDisconnect() {
 			var stateAtDisconnectTime = this._state;
 			this._state = 'unconnected';
-			if (this._active && stateAtDisconnectTime !== 'retrying') {
+			// Remove all event listeners. If the socket emits a 'close' event, we do not want to be repeating the already-emitted event.
+			this._teardown();
+			if (this._active) {
 				this._retryConnection();
 			}
 			if (stateAtDisconnectTime === 'connected') {
@@ -502,6 +523,7 @@
 				//TODO: Custom delay strategy.
 				self._reconnectTimeout = setTimeout(function() {
 					self._reconnectTimeout = null;
+					self._state = 'connecting';
 					self._connect();
 				}, 2000);
 			}

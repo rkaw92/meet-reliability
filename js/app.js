@@ -21,6 +21,7 @@
 			this._revelationButton = window.document.getElementById('revelation');
 			this._connectionStatusIndicator = window.document.getElementById('connectionStatusIndicator');
 			this._demoForms = window.document.getElementsByClassName('demoForm');
+			this._requestLogs = window.document.getElementsByClassName('requestLog');
 			
 			// State:
 			this._config = config || {
@@ -64,6 +65,7 @@
 		
 		_installEventHandlers() {
 			var self = this;
+			var requestLogs = this._requestLogs;
 			// We are going to inspect every message to see if it looks like an event.
 			// If it does, we process it and update the auction's state.
 			self._appClient.transport.on('message', function(message) {
@@ -78,6 +80,14 @@
 					
 					self._updateAuctionPreview();
 				}
+			});
+			
+			// The request log on "No effects lost" presents the requests as they happen and responses to them:
+			self._appClient.RPC.on('request', function(request) {
+				self._logMessage(requestLogs[0], 'request: ' + request.method);
+			});
+			self._appClient.RPC.on('response', function(response) {
+				self._logMessage(requestLogs[0], 'response: ' + (response.error ? 'ERROR' : 'ok'));
 			});
 		}
 		
@@ -124,6 +134,13 @@
 			this._revealed = true;
 		}
 		
+		_logMessage(logElement, message) {
+			var listElement = logElement.querySelector('ol');
+			var logEntryElement = window.document.createElement('li');
+			logEntryElement.textContent = message;
+			listElement.appendChild(logEntryElement);
+		}
+		
 		run() {
 			var self = this;
 			var revelationButton = self._revelationButton;
@@ -159,12 +176,12 @@
 				});
 			});
 			
-			// The second one is much like the first, but 
-			demoForms[0].querySelector('button').addEventListener('click', function() {
+			// The second one is much like the first.
+			demoForms[1].querySelector('button').addEventListener('click', function() {
 				self._appClient.call('placeOffer', {
 					ID: self._config.auctionID,
 					buyer: 'joe',
-					amount: Number(demoForms[0].querySelector('input').value)
+					amount: Number(demoForms[1].querySelector('input').value)
 				});
 			});
 		}

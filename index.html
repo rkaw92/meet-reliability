@@ -94,6 +94,12 @@
 					<li>Correlated request-response over connected transport</li>
 				</ul>
 			</li>
+			<li>Simplicity
+				<ul style="font-size: 75%;">
+					<li>{ method: 'getAuction', params: { ID: '123' }, id: 'req1', jsonrpc: '2.0' }</li>
+					<li>{ result: { name: 'Some auction' }, id: 'req1', jsonrpc: '2.0' }</li>
+				</ul>
+			</li>
 		</ol>
 	</section>
 	
@@ -107,6 +113,15 @@
 				</ul>
 			</li>
 		</ul>
+		<div class="secret demoForm">
+			<p>Place your offer:</p>
+			€ <input type="text" value="1.00"><button>Bid</button>
+		</div>
+		<div class="secret requestLog">
+			<ol>
+				
+			</ol>
+		</div>
 	</section>
 	
 	<section class="slide">
@@ -119,6 +134,14 @@
 			</li>
 			<li>All identifiers supplied by the client</li>
 		</ul>
+		<div class="secret codeSample">
+			<pre>// Check if the buyer has already offered this amount. If so, there is no point in letting them offer it again.
+if (this._offers.some(function(placedOffer) {
+	return placedOffer.buyer === offerToPlace.buyer &amp;&amp; placedOffer.amount === offerToPlace.amount;
+})) {
+	return;
+}</pre>
+		</div>
 	</section>
 	
 	<section class="slide">
@@ -127,10 +150,10 @@
 			<li>Reactive messaging
 				<ol>
 					<li>Pub-Sub</li>
+					<li>WebSocket to the client</li>
 					<li>Event Sourcing at the core</li>
 					<li>Read-side projections (CQRS)</li>
 					<li>Properly-named events capture intent</li>
-					<li>WebSocket to the client</li>
 				</ol>
 			</li>
 		</ul>
